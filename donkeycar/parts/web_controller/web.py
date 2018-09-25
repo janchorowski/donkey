@@ -10,10 +10,9 @@ remotes.py
 The client and web server needed to control a car remotely.
 """
 
-import random
-
-
+import json
 import os
+import random
 import time
 
 import tornado
@@ -58,6 +57,7 @@ class LocalWebController(tornado.web.Application):
             (r"/", tornado.web.RedirectHandler, dict(url="/drive")),
             (r"/drive", DriveAPI),
             (r"/video", VideoAPI),
+            (r"/updates", UpdateAPI),
             (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": self.static_file_path}),
         ]
 
@@ -102,6 +102,17 @@ class LocalWebController(tornado.web.Application):
         return self.run_threaded(img_arr)
 
 
+class UpdateAPI(tornado.web.RequestHandler):
+    def get(self):
+        data = {
+            'steer': random.random() *2 -1,
+            'throttle': random.random() *2 -1,
+            'dist': int(random.random() *1000),
+            'mask': random.randint(0,3)
+        }
+        self.write(json.dumps(data))
+
+    
 class DriveAPI(tornado.web.RequestHandler):
     def get(self):
         data = {}
